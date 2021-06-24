@@ -1,0 +1,5 @@
+{% block flatpickr_widget -%}
+    <div class="flatpickr-container" {{ stimulus_controller(controller_name, controller_values) }}>
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock %}

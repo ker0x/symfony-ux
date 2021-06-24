@@ -1,0 +1,51 @@
+{
+    "name": "symfony/ux-flatpickr",
+    "type": "symfony-bundle",
+    "description": "Datepicker based on Flatpickr for Symfony Forms",
+    "keywords": [
+        "symfony-ux",
+        "datepicker",
+        "flatpicker"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Symfony\\UX\\Flatpickr\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfony\\UX\\Flatpickr\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/config": "^4.4|^5.0",
+        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/form": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0"
+    },
+    "require-dev": {
+        "symfony/framework-bundle": "^4.4|^5.0",
+        "symfony/phpunit-bridge": "^5.2",
+        "symfony/twig-bundle": "^4.4|^5.0",
+        "symfony/var-dumper": "^4.4|^5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.4-dev"
+        },
+        "thanks": {
+            "name": "symfony/ux",
+            "url": "https://github.com/symfony/ux"
+        }
+    },
+    "minimum-stability": "dev"
+}
