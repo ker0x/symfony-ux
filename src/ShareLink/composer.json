@@ -1,0 +1,49 @@
+{
+    "name": "symfony/ux-share-link",
+    "type": "symfony-bundle",
+    "description": "Generates social share links (Email, Facebook, X, LinkedIn, Threads, WhatsApp, Telegram, Reddit, Pinterest, Bluesky, Mastodon) in Twig templates.",
+    "keywords": [
+        "symfony-ux",
+        "share",
+        "social"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Symfony\\UX\\ShareLink\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfony\\UX\\ShareLink\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=8.4",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/twig-bundle": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.1|^12.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "conflict": {
+        "symfony/flex": "<1.13"
+    },
+    "extra": {
+        "thanks": {
+            "name": "symfony/ux",
+            "url": "https://github.com/symfony/ux"
+        }
+    },
+    "minimum-stability": "dev"
+}
