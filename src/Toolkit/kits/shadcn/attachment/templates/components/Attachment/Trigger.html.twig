@@ -1,0 +1,12 @@
+{# @prop as 'button' The HTML tag to render. #}
+{# @block content The optional trigger label, usually left empty as the trigger covers the whole attachment. #}
+{%- props as = 'button' -%}
+<{{ as }}
+    data-slot="attachment-trigger"
+    {{ attributes.defaults({
+        class: 'absolute inset-0 z-10 outline-none'|tailwind_classes,
+        type: as == 'button' ? 'button' : false,
+    }) }}
+>
+    {%- block content %}{% endblock -%}
+</{{ as }}>
