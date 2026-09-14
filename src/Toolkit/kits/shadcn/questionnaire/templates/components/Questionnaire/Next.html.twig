@@ -1,0 +1,15 @@
+{# @prop variant 'default'|'secondary'|'destructive'|'outline'|'ghost'|'link' The button style variant. #}
+{# @prop size 'default'|'xs'|'sm'|'lg'|'icon'|'icon-xs'|'icon-sm'|'icon-lg' The button size. #}
+{# @block content The button label. #}
+{%- props variant = 'default', size = 'default' -%}
+<twig:Button
+    variant="{{ variant }}"
+    size="{{ size }}"
+    data-slot="questionnaire-next"
+    data-questionnaire-target="next"
+    data-action="click->questionnaire#next"
+    class="col-start-3 row-start-1 min-h-11 justify-self-end sm:min-h-0 [&[hidden]]:hidden"
+    {{ ...attributes }}
+>
+    {{- block(outerBlocks.content)|default('Next') -}}
+</twig:Button>

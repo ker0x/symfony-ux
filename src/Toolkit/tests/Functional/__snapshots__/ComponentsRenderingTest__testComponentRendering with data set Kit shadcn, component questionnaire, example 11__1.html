@@ -1,0 +1,144 @@
+<!--
+- Kit: Shadcn UI
+- Component: Questionnaire
+- Code:
+```twig
+<twig:Questionnaire id="animated" defaultItem="task" class="mx-auto max-w-md">
+    <twig:Questionnaire:Progress />
+
+    <twig:Questionnaire:Item
+        name="task"
+        required
+        class="data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none"
+    >
+        <twig:Questionnaire:Title>What should the agent do?</twig:Questionnaire:Title>
+        <twig:Questionnaire:Description>Each item fades and slides in as it becomes active.</twig:Questionnaire:Description>
+        <twig:Questionnaire:Choices>
+            <twig:Questionnaire:Choice value="implement">Implement the change</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="debug">Debug the failure</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="review">Review the diff</twig:Questionnaire:Choice>
+        </twig:Questionnaire:Choices>
+        <twig:Questionnaire:Error />
+    </twig:Questionnaire:Item>
+
+    <twig:Questionnaire:Item
+        name="review"
+        required
+        class="data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none"
+    >
+        <twig:Questionnaire:Title>How much should be reviewed?</twig:Questionnaire:Title>
+        <twig:Questionnaire:Choices>
+            <twig:Questionnaire:Choice value="targeted">The touched files</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="complete">The complete diff</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="manual">A manual walkthrough</twig:Questionnaire:Choice>
+        </twig:Questionnaire:Choices>
+        <twig:Questionnaire:Error />
+    </twig:Questionnaire:Item>
+
+    <twig:Questionnaire:Item
+        name="delivery"
+        required
+        class="data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none"
+    >
+        <twig:Questionnaire:Title>How should the result be delivered?</twig:Questionnaire:Title>
+        <twig:Questionnaire:Choices>
+            <twig:Questionnaire:Choice value="summary">A short summary</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="branch">A review branch</twig:Questionnaire:Choice>
+        </twig:Questionnaire:Choices>
+        <twig:Questionnaire:Error />
+    </twig:Questionnaire:Item>
+
+    <twig:Questionnaire:Actions>
+        <twig:Questionnaire:Previous />
+        <twig:Questionnaire:Next />
+        <twig:Questionnaire:Submit>Start work</twig:Questionnaire:Submit>
+    </twig:Questionnaire:Actions>
+</twig:Questionnaire>
+```
+- Rendered code (prettified for testing purposes, run "php vendor/bin/phpunit -d --update-snapshots" to update snapshots): -->
+<form id="animated" data-slot="questionnaire" data-questionnaire-active-item-value="task" data-questionnaire-shortcuts-value="" class="flex w-full min-w-0 flex-col gap-4 mx-auto max-w-md" data-controller="questionnaire" data-action="keydown-&gt;questionnaire#onKeyDown submit-&gt;questionnaire#onSubmit change-&gt;questionnaire#onAnswerChange input-&gt;questionnaire#onAnswerInput">
+<div data-slot="questionnaire-progress" data-questionnaire-target="progress" role="progressbar" aria-label="Questionnaire progress" aria-valuemin="1" aria-valuenow="1" aria-valuemax="1" class="min-h-[1lh] w-fit min-w-[14ch] text-xs font-medium text-muted-foreground tabular-nums">Question <span data-questionnaire-target="progressCurrent">1</span> of <span data-questionnaire-target="progressTotal">1</span>
+</div>
+
+
+    <fieldset data-slot="questionnaire-item" data-questionnaire-target="item" data-name="task" data-multiple="false" data-required="true" data-status="unanswered" data-active="true" class="flex min-w-0 flex-col gap-4 border-0 p-0 outline-none [&amp;[hidden]]:hidden data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none">
+<legend data-slot="questionnaire-title" class="cn-font-heading text-base leading-snug font-medium text-pretty [&amp;:not(:has(~[data-slot=questionnaire-description]))]:mb-4">What should the agent do?</legend>
+        <p data-slot="questionnaire-description" class="text-sm text-muted-foreground text-pretty">Each item fades and slides in as it becomes active.</p>
+        <div data-slot="questionnaire-choices" class="group/questionnaire-choices grid min-w-0 gap-2">
+<label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="task" value="implement" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">Implement the change</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+            <label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="task" value="debug" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">Debug the failure</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+            <label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="task" value="review" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">Review the diff</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+        </div>
+        <p id="animated-task-error" data-slot="questionnaire-error" data-questionnaire-target="error" role="alert" hidden class="mt-2 text-sm text-destructive"></p>
+
+    </fieldset>
+
+    <fieldset data-slot="questionnaire-item" data-questionnaire-target="item" data-name="review" data-multiple="false" data-required="true" data-status="unanswered" data-active="false" hidden inert class="flex min-w-0 flex-col gap-4 border-0 p-0 outline-none [&amp;[hidden]]:hidden data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none">
+<legend data-slot="questionnaire-title" class="cn-font-heading text-base leading-snug font-medium text-pretty [&amp;:not(:has(~[data-slot=questionnaire-description]))]:mb-4">How much should be reviewed?</legend>
+        <div data-slot="questionnaire-choices" class="group/questionnaire-choices grid min-w-0 gap-2">
+<label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="review" value="targeted" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">The touched files</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+            <label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="review" value="complete" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">The complete diff</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+            <label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="review" value="manual" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">A manual walkthrough</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+        </div>
+        <p id="animated-review-error" data-slot="questionnaire-error" data-questionnaire-target="error" role="alert" hidden class="mt-2 text-sm text-destructive"></p>
+
+    </fieldset>
+
+    <fieldset data-slot="questionnaire-item" data-questionnaire-target="item" data-name="delivery" data-multiple="false" data-required="true" data-status="unanswered" data-active="false" hidden inert class="flex min-w-0 flex-col gap-4 border-0 p-0 outline-none [&amp;[hidden]]:hidden data-[active=true]:animate-in data-[active=true]:fade-in-0 data-[active=true]:slide-in-from-bottom-2 data-[active=true]:duration-300 motion-reduce:animate-none">
+<legend data-slot="questionnaire-title" class="cn-font-heading text-base leading-snug font-medium text-pretty [&amp;:not(:has(~[data-slot=questionnaire-description]))]:mb-4">How should the result be delivered?</legend>
+        <div data-slot="questionnaire-choices" class="group/questionnaire-choices grid min-w-0 gap-2">
+<label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="delivery" value="summary" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">A short summary</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+            <label data-slot="questionnaire-choice" data-type="radio" data-disabled="false" class="group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[&gt;input:checked]:border-primary/40 has-[&gt;input:checked]:bg-muted has-[&gt;input:focus-visible]:border-ring has-[&gt;input:focus-visible]:ring-3 has-[&gt;input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[&gt;input:checked]:bg-muted">
+    <input type="radio" name="delivery" value="branch" data-slot="questionnaire-choice-input" data-questionnaire-target="answer" class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0">
+    <span data-slot="questionnaire-choice-indicator" aria-hidden="true" class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[&gt;input:checked]/questionnaire-choice:border-primary group-has-[&gt;input:checked]/questionnaire-choice:bg-primary group-has-[&gt;input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"><span data-slot="questionnaire-choice-indicator-dot" class="hidden size-2 rounded-full bg-primary-foreground group-has-[&gt;input:checked]/questionnaire-choice:block"></span></span>
+    <span data-slot="questionnaire-choice-label" class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug">A review branch</span>
+    <span data-slot="questionnaire-choice-shortcut" aria-hidden="true" class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"></span>
+</label>
+        </div>
+        <p id="animated-delivery-error" data-slot="questionnaire-error" data-questionnaire-target="error" role="alert" hidden class="mt-2 text-sm text-destructive"></p>
+
+    </fieldset>
+
+    <div data-slot="questionnaire-actions" class="grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:min-h-8">
+<button data-slot="button" data-size="default" data-variant="outline" class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 px-2.5 ltr:has-data-[icon=inline-end]:pr-2 rtl:has-data-[icon=inline-end]:pe-2 ltr:has-data-[icon=inline-start]:pl-2 rtl:has-data-[icon=inline-start]:ps-2 col-start-1 row-start-1 min-h-11 justify-self-start sm:min-h-0 [&amp;[hidden]]:hidden" type="button" data-questionnaire-target="previous" data-action="click-&gt;questionnaire#previous">Previous</button>
+
+        <button data-slot="button" data-size="default" data-variant="default" class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 gap-1.5 px-2.5 ltr:has-data-[icon=inline-end]:pr-2 rtl:has-data-[icon=inline-end]:pe-2 ltr:has-data-[icon=inline-start]:pl-2 rtl:has-data-[icon=inline-start]:ps-2 col-start-3 row-start-1 min-h-11 justify-self-end sm:min-h-0 [&amp;[hidden]]:hidden" type="button" data-questionnaire-target="next" data-action="click-&gt;questionnaire#next">Next</button>
+
+        <button data-slot="button" data-size="default" data-variant="default" class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 gap-1.5 px-2.5 ltr:has-data-[icon=inline-end]:pr-2 rtl:has-data-[icon=inline-end]:pe-2 ltr:has-data-[icon=inline-start]:pl-2 rtl:has-data-[icon=inline-start]:ps-2 col-start-3 row-start-1 min-h-11 justify-self-end sm:min-h-0 [&amp;[hidden]]:hidden" type="submit" data-questionnaire-target="submit">Start work</button>
+    </div>
+</form>

@@ -1,0 +1,9 @@
+{# @block content The answers, typically multiple `Questionnaire:Choice` components and an optional `Questionnaire:Input`. #}
+<div
+    data-slot="questionnaire-choices"
+    {{ attributes.defaults({
+        class: 'group/questionnaire-choices grid min-w-0 gap-2'|tailwind_classes,
+    }) }}
+>
+    {%- block content %}{% endblock -%}
+</div>

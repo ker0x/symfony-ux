@@ -1,0 +1,17 @@
+{# @block content The progress label, replacing the default "Question X of Y" wording. #}
+<div
+    data-slot="questionnaire-progress"
+    data-questionnaire-target="progress"
+    role="progressbar"
+    aria-label="Questionnaire progress"
+    aria-valuemin="1"
+    aria-valuenow="1"
+    aria-valuemax="1"
+    {{ attributes.defaults({
+        class: 'min-h-[1lh] w-fit min-w-[14ch] text-xs font-medium text-muted-foreground tabular-nums'|tailwind_classes,
+    }) }}
+>
+    {%- block content -%}
+        Question <span data-questionnaire-target="progressCurrent">1</span> of <span data-questionnaire-target="progressTotal">1</span>
+    {%- endblock -%}
+</div>

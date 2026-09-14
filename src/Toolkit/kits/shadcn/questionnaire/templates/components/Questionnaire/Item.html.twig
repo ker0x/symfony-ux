@@ -1,0 +1,30 @@
+{# @prop name string Name submitted with the answer, also identifying the item during navigation. #}
+{# @prop required boolean Whether an answer is required before leaving the item. #}
+{# @prop multiple boolean Whether the item accepts more than one answer. #}
+{# @prop disabled boolean Whether the item is inert and skipped by navigation. #}
+{# @block content The item structure, typically includes `Questionnaire:Title`, `Questionnaire:Choices` and `Questionnaire:Error`. #}
+{%- props name, required = false, multiple = false, disabled = false -%}
+{%- set _questionnaire_id = inject('questionnaire.id', 'questionnaire') -%}
+{%- set _questionnaire_defaultItem = inject('questionnaire.defaultItem', '') -%}
+{%- set _active = _questionnaire_defaultItem is not empty and _questionnaire_defaultItem == name -%}
+{%- do provide('questionnaire.itemName', name) -%}
+{%- do provide('questionnaire.itemInputName', name ~ (multiple ? '[]' : '')) -%}
+{%- do provide('questionnaire.itemMultiple', multiple) -%}
+{%- do provide('questionnaire.itemRequired', required) -%}
+{%- do provide('questionnaire.itemErrorId', _questionnaire_id ~ '-' ~ name ~ '-error') -%}
+<fieldset
+    data-slot="questionnaire-item"
+    data-questionnaire-target="item"
+    data-name="{{ name }}"
+    data-multiple="{{ multiple ? 'true' : 'false' }}"
+    data-required="{{ required ? 'true' : 'false' }}"
+    data-status="unanswered"
+    data-active="{{ _active ? 'true' : 'false' }}"
+    {% if disabled %}disabled{% endif %}
+    {% if not _active %}hidden inert{% endif %}
+    {{ attributes.defaults({
+        class: 'flex min-w-0 flex-col gap-4 border-0 p-0 outline-none [&[hidden]]:hidden'|tailwind_classes,
+    }) }}
+>
+    {%- block content %}{% endblock -%}
+</fieldset>

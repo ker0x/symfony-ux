@@ -6,6 +6,7 @@
 - Add support for blocks: ready-to-use page sections built from a kit's components, installed and previewed as a unit
 - [Shadcn] Add the `login-01` and `login-02` login blocks
 - [Shadcn] Add `input-otp` recipe
+- [Shadcn] Add `questionnaire` recipe
 - [Shadcn] Add `menubar` recipe
 - [Shadcn] Add `navigation-menu` recipe
 - [Shadcn] Add `popover` recipe

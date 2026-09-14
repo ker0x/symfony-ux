@@ -1,0 +1,56 @@
+{# @prop value string The value submitted when this choice is selected. #}
+{# @prop checked boolean Whether the choice is selected on initial render. #}
+{# @prop disabled boolean Whether the choice can be selected. #}
+{# @block content The choice label, optionally followed by a `Questionnaire:ChoiceDescription`. #}
+{%- props value, checked = false, disabled = false -%}
+{%- set _questionnaire_itemInputName = inject('questionnaire.itemInputName', '') -%}
+{%- set _questionnaire_itemMultiple = inject('questionnaire.itemMultiple', false) -%}
+{%- set _type = _questionnaire_itemMultiple ? 'checkbox' : 'radio' -%}
+<label
+    data-slot="questionnaire-choice"
+    data-type="{{ _type }}"
+    data-disabled="{{ disabled ? 'true' : 'false' }}"
+    {{ attributes.defaults({
+        class: 'group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-lg border border-input bg-transparent px-3 py-2.5 text-sm transition-colors outline-none select-none text-start hover:bg-muted/50 has-[>input:checked]:border-primary/40 has-[>input:checked]:bg-muted has-[>input:focus-visible]:border-ring has-[>input:focus-visible]:ring-3 has-[>input:focus-visible]:ring-ring/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50 dark:bg-input/20 dark:has-[>input:checked]:bg-muted'|tailwind_classes,
+    }) }}
+>
+    <input
+        type="{{ _type }}"
+        name="{{ _questionnaire_itemInputName }}"
+        value="{{ value }}"
+        data-slot="questionnaire-choice-input"
+        data-questionnaire-target="answer"
+        class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0"
+        {% if checked %}checked{% endif %}
+        {% if disabled %}disabled{% endif %}
+    >
+    <span
+        data-slot="questionnaire-choice-indicator"
+        aria-hidden="true"
+        class="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[4px] border border-input group-data-[type=radio]/questionnaire-choice:rounded-full group-has-[>input:checked]/questionnaire-choice:border-primary group-has-[>input:checked]/questionnaire-choice:bg-primary group-has-[>input:checked]/questionnaire-choice:text-primary-foreground group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 dark:bg-input/30"
+    >
+        {%- if _type == 'radio' -%}
+            <span
+                data-slot="questionnaire-choice-indicator-dot"
+                class="hidden size-2 rounded-full bg-primary-foreground group-has-[>input:checked]/questionnaire-choice:block"
+            ></span>
+        {%- else -%}
+            <twig:ux:icon
+                name="lucide:check"
+                data-slot="questionnaire-choice-indicator-check"
+                class="hidden size-3.5 group-has-[>input:checked]/questionnaire-choice:block"
+            />
+        {%- endif -%}
+    </span>
+    <span
+        data-slot="questionnaire-choice-label"
+        class="flex min-w-0 flex-1 flex-col gap-0.5 leading-snug"
+    >
+        {%- block content %}{% endblock -%}
+    </span>
+    <span
+        data-slot="questionnaire-choice-shortcut"
+        aria-hidden="true"
+        class="pointer-events-none hidden size-5 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-md border border-input bg-background font-mono text-[0.625rem] leading-none font-medium text-muted-foreground ms-auto group-data-[shortcut]/questionnaire-choice:inline-flex group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5"
+    ></span>
+</label>
