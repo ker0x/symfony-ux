@@ -5,6 +5,7 @@
 {%- props value, checked = false, disabled = false -%}
 {%- set _questionnaire_itemInputName = inject('questionnaire.itemInputName', '') -%}
 {%- set _questionnaire_itemMultiple = inject('questionnaire.itemMultiple', false) -%}
+{%- set _questionnaire_interactive = inject('questionnaire.interactive', true) -%}
 {%- set _type = _questionnaire_itemMultiple ? 'checkbox' : 'radio' -%}
 <label
     data-slot="questionnaire-choice"
@@ -19,7 +20,7 @@
         name="{{ _questionnaire_itemInputName }}"
         value="{{ value }}"
         data-slot="questionnaire-choice-input"
-        data-questionnaire-target="answer"
+        {% if _questionnaire_interactive %}data-questionnaire-target="answer"{% endif %}
         class="absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0"
         {% if checked %}checked{% endif %}
         {% if disabled %}disabled{% endif %}

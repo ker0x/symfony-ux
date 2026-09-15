@@ -1,11 +1,11 @@
 {# @block content The validation message, replacing the default "Please answer this question." wording. #}
 {%- set _questionnaire_itemErrorId = inject('questionnaire.itemErrorId', '') -%}
+{%- set _questionnaire_interactive = inject('questionnaire.interactive', true) -%}
 <p
     id="{{ _questionnaire_itemErrorId }}"
     data-slot="questionnaire-error"
-    data-questionnaire-target="error"
+    {% if _questionnaire_interactive %}data-questionnaire-target="error" hidden{% endif %}
     role="alert"
-    hidden
     {{ attributes.defaults({
         class: 'mt-2 text-sm text-destructive'|tailwind_classes,
     }) }}

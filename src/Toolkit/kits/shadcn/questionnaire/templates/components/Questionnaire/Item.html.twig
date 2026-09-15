@@ -6,7 +6,11 @@
 {%- props name, required = false, multiple = false, disabled = false -%}
 {%- set _questionnaire_id = inject('questionnaire.id', 'questionnaire') -%}
 {%- set _questionnaire_defaultItem = inject('questionnaire.defaultItem', '') -%}
-{%- set _active = _questionnaire_defaultItem is not empty and _questionnaire_defaultItem == name -%}
+{%- set _questionnaire_interactive = inject('questionnaire.interactive', true) -%}
+{# Without the controller there is no JS to reveal the first item, so an unset `defaultItem` shows them all. #}
+{%- set _active = _questionnaire_interactive
+    ? (_questionnaire_defaultItem is not empty and _questionnaire_defaultItem == name)
+    : (_questionnaire_defaultItem is empty or _questionnaire_defaultItem == name) -%}
 {%- do provide('questionnaire.itemName', name) -%}
 {%- do provide('questionnaire.itemInputName', name ~ (multiple ? '[]' : '')) -%}
 {%- do provide('questionnaire.itemMultiple', multiple) -%}
@@ -14,7 +18,7 @@
 {%- do provide('questionnaire.itemErrorId', _questionnaire_id ~ '-' ~ name ~ '-error') -%}
 <fieldset
     data-slot="questionnaire-item"
-    data-questionnaire-target="item"
+    {% if _questionnaire_interactive %}data-questionnaire-target="item"{% endif %}
     data-name="{{ name }}"
     data-multiple="{{ multiple ? 'true' : 'false' }}"
     data-required="{{ required ? 'true' : 'false' }}"

@@ -2,13 +2,18 @@
 {# @prop size 'default'|'xs'|'sm'|'lg'|'icon'|'icon-xs'|'icon-sm'|'icon-lg' The button size. #}
 {# @block content The button label. #}
 {%- props variant = 'outline', size = 'default' -%}
+{%- set _questionnaire_interactive = inject('questionnaire.interactive', true) -%}
+{# Without the controller a `type="button"` is inert, so the button submits the step to the server instead. #}
+{%- set _questionnaire_skip_attrs = _questionnaire_interactive ? {
+    'data-questionnaire-target': 'skip',
+    'data-action': 'click->questionnaire#skip',
+} : {type: 'submit'} -%}
 <twig:Button
     variant="{{ variant }}"
     size="{{ size }}"
     data-slot="questionnaire-skip"
-    data-questionnaire-target="skip"
-    data-action="click->questionnaire#skip"
     class="col-start-2 row-start-1 min-h-11 justify-self-end sm:min-h-0 [&[hidden]]:hidden"
+    {{ ..._questionnaire_skip_attrs }}
     {{ ...attributes }}
 >
     {{- block(outerBlocks.content)|default('Skip') -}}

@@ -93,6 +93,8 @@ A multi-step questionnaire with single-choice, multiple-choice, freeform, and sk
 
 `Questionnaire` owns the ordered items, the active item, validation, progress, and navigation. The containing page, card, or dialog owns cancellation, persistence, and transport.
 
+Set `:interactive="false"` to hand that ownership to the server instead. The component then renders as plain markup: no `data-controller`, no `data-action`, and no `data-questionnaire-*` attributes anywhere in the tree, so the Stimulus controller never boots. See [Server-Driven Flow](#server-driven-flow).
+
 ## Examples
 
 ### Multiple Selection
@@ -657,6 +659,61 @@ Compose `Questionnaire` inside a `Dialog` while keeping cancellation and dismiss
     </twig:Dialog:Content>
 </twig:Dialog>
 ```
+
+### Server-Driven Flow
+
+Set `:interactive="false"` when the server owns the flow, as with a Symfony Form spread over several steps. The Stimulus controller is not registered at all, so nothing on the client moves the user between questions, validates an answer, or shows and hides the navigation — the server renders the current step, its error, and the buttons it wants.
+
+In this mode `defaultItem` selects which `Questionnaire:Item` is rendered visible; leave it unset and every item renders, so the usual approach is to output only the current step. `Questionnaire:Progress` takes `current` and `total` to keep the progressbar accurate, `Questionnaire:Error` renders whenever you output it, and `Questionnaire:Previous`, `Questionnaire:Skip` and `Questionnaire:Next` become `type="submit"` so a `name` and `value` tell the server which way to go.
+
+```twig {"preview":true,"height":"440px"}
+<twig:Questionnaire id="server-flow" :interactive="false" defaultItem="verification" class="mx-auto max-w-md">
+    <twig:Questionnaire:Progress :current="2" :total="4" />
+
+    <twig:Questionnaire:Item name="verification" required>
+        <twig:Questionnaire:Title>How should the migration be verified?</twig:Questionnaire:Title>
+        <twig:Questionnaire:Description>The server validated this step and sent you back to it.</twig:Questionnaire:Description>
+        <twig:Questionnaire:Choices>
+            <twig:Questionnaire:Choice value="tests">Automated tests</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="typecheck">Type checking</twig:Questionnaire:Choice>
+            <twig:Questionnaire:Choice value="manual">Manual review</twig:Questionnaire:Choice>
+        </twig:Questionnaire:Choices>
+        <twig:Questionnaire:Error>Choose how the migration should be verified.</twig:Questionnaire:Error>
+    </twig:Questionnaire:Item>
+
+    <twig:Questionnaire:Actions>
+        <twig:Questionnaire:Previous name="flow[back]" value="1" />
+        <twig:Questionnaire:Next name="flow[next]" value="1" />
+    </twig:Questionnaire:Actions>
+</twig:Questionnaire>
+```
+
+Render the item for the step the form flow is on, and read the answer back under the item name:
+
+```twig
+<twig:Questionnaire :interactive="false" defaultItem="{{ flow.currentStepName }}">
+    <twig:Questionnaire:Progress :current="flow.currentStepNumber" :total="flow.stepCount" />
+
+    <twig:Questionnaire:Item name="{{ flow.currentStepName }}" required>
+        <twig:Questionnaire:Title>{{ form.vars.label }}</twig:Questionnaire:Title>
+        <twig:Questionnaire:Choices>
+            {% for choice in form.vars.choices %}
+                <twig:Questionnaire:Choice value="{{ choice.value }}">{{ choice.label }}</twig:Questionnaire:Choice>
+            {% endfor %}
+        </twig:Questionnaire:Choices>
+        {% for error in form.vars.errors %}
+            <twig:Questionnaire:Error>{{ error.message }}</twig:Questionnaire:Error>
+        {% endfor %}
+    </twig:Questionnaire:Item>
+
+    <twig:Questionnaire:Actions>
+        <twig:Questionnaire:Previous name="flow[back]" value="1" />
+        <twig:Questionnaire:Next name="flow[next]" value="1" />
+    </twig:Questionnaire:Actions>
+</twig:Questionnaire>
+```
+
+A `Questionnaire:Input` shares the name of its item so the controller can treat it as an alternative answer. Without the controller that empty input is still submitted and shadows the selected choice, so give it its own `name` here: `<twig:Questionnaire:Input name="verification_other" />`.
 
 ### RTL
 
