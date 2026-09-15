@@ -666,36 +666,40 @@ Set `:interactive="false"` when the server owns the flow, as with a Symfony [for
 
 In this mode `defaultItem` selects which `Questionnaire:Item` is rendered visible; leave it unset and every item renders, so the usual approach is to output only the current step. `Questionnaire:Progress` takes `current` and `total` to keep the progressbar accurate, `Questionnaire:Error` renders whenever you output it, and `Questionnaire:Previous`, `Questionnaire:Skip` and `Questionnaire:Next` become `type="submit"` so a `name` and `value` tell the server which way to go.
 
-```twig {"preview":true,"height":"440px"}
-<twig:Questionnaire id="server-flow" :interactive="false" defaultItem="verification" class="mx-auto max-w-md">
-    <twig:Questionnaire:Progress :current="2" :total="4" />
+`Questionnaire` renders a `form` by default. Set `as="div"` to nest it inside a form you already render, and let that outer form own the method, the action and the hidden fields.
 
-    <twig:Questionnaire:Item name="verification" required>
-        <twig:Questionnaire:Title>How should the migration be verified?</twig:Questionnaire:Title>
-        <twig:Questionnaire:Description>The server validated this step and sent you back to it.</twig:Questionnaire:Description>
-        <twig:Questionnaire:Choices>
-            <twig:Questionnaire:Choice value="tests">Automated tests</twig:Questionnaire:Choice>
-            <twig:Questionnaire:Choice value="typecheck">Type checking</twig:Questionnaire:Choice>
-            <twig:Questionnaire:Choice value="manual">Manual review</twig:Questionnaire:Choice>
-        </twig:Questionnaire:Choices>
-        <twig:Questionnaire:Error>Choose how the migration should be verified.</twig:Questionnaire:Error>
-    </twig:Questionnaire:Item>
+```twig {"preview":true,"height":"460px"}
+<form method="post" class="mx-auto max-w-md">
+    <twig:Questionnaire id="server-flow" as="div" :interactive="false" defaultItem="verification">
+        <twig:Questionnaire:Progress :current="2" :total="4" />
 
-    <twig:Questionnaire:Actions>
-        <twig:Questionnaire:Previous name="step" value="back" />
-        <twig:Questionnaire:Next name="step" value="next" />
-    </twig:Questionnaire:Actions>
-</twig:Questionnaire>
+        <twig:Questionnaire:Item name="verification" required>
+            <twig:Questionnaire:Title>How should the migration be verified?</twig:Questionnaire:Title>
+            <twig:Questionnaire:Description>The server validated this step and sent you back to it.</twig:Questionnaire:Description>
+            <twig:Questionnaire:Choices>
+                <twig:Questionnaire:Choice value="tests">Automated tests</twig:Questionnaire:Choice>
+                <twig:Questionnaire:Choice value="typecheck">Type checking</twig:Questionnaire:Choice>
+                <twig:Questionnaire:Choice value="manual">Manual review</twig:Questionnaire:Choice>
+            </twig:Questionnaire:Choices>
+            <twig:Questionnaire:Error>Choose how the migration should be verified.</twig:Questionnaire:Error>
+        </twig:Questionnaire:Item>
+
+        <twig:Questionnaire:Actions>
+            <twig:Questionnaire:Previous name="step" value="back" formnovalidate />
+            <twig:Questionnaire:Next name="step" value="next" />
+        </twig:Questionnaire:Actions>
+    </twig:Questionnaire>
+</form>
 ```
 
 #### With a Symfony form flow
 
-A flow type declares its steps and its navigation buttons, and the controller renders the form of the current step:
+A flow type declares its steps and adds a navigator, which supplies the `back`, `next`, `finish` and `reset` buttons:
 
 ```php
 use Symfony\Component\Form\Flow\AbstractFlowType;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
-use Symfony\Component\Form\Flow\Type\{FinishFlowType, NextFlowType, PreviousFlowType};
+use Symfony\Component\Form\Flow\Type\NavigatorFlowType;
 
 class MigrationType extends AbstractFlowType
 {
@@ -704,12 +708,12 @@ class MigrationType extends AbstractFlowType
         $builder->addStep('change', ChangeType::class);
         $builder->addStep('verification', VerificationType::class);
 
-        $builder->add('back', PreviousFlowType::class);
-        $builder->add('continue', NextFlowType::class);
-        $builder->add('finish', FinishFlowType::class);
+        $builder->add('navigator', NavigatorFlowType::class);
     }
 }
 ```
+
+The controller renders the form of the current step:
 
 ```php
 $flow = $this->createForm(MigrationType::class, $migration);
@@ -722,50 +726,63 @@ if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
 return $this->render('migration.html.twig', ['form' => $flow->getStepForm()]);
 ```
 
-The `form_flow_*()` functions read the flow cursor, and the `field_*()` functions give each field its submitted name, label, choices and errors. `Questionnaire` renders the `form` element itself, so pass `method` and the form's `action` to it rather than wrapping it in `form_start()`, and close with `form_rest()` so the CSRF token and the flow's own hidden fields are still submitted:
+The `form_flow_*()` functions read the flow cursor, and the `field_*()` functions give each field its submitted name, label, choices and errors. Calling `field_name()` also marks the field as rendered, so `form_end()` still emits the CSRF token and the flow's hidden fields without duplicating anything you laid out by hand:
 
 ```twig
 {# `form` is the step form returned by `$flow->getStepForm()` #}
-<twig:Questionnaire :interactive="false" method="post">
-    <twig:Questionnaire:Progress
-        :current="form_flow_step_index(form) + 1"
-        :total="form_flow_total_steps(form)"
-    />
+{% set step = form_flow_current_step(form) %}
 
-    <twig:Questionnaire:Item name="{{ field_name(form.verification) }}" required>
-        <twig:Questionnaire:Title>{{ field_label(form.verification) }}</twig:Questionnaire:Title>
-        <twig:Questionnaire:Choices>
-            {% for choice in field_choices(form.verification) %}
-                <twig:Questionnaire:Choice value="{{ choice.value }}">{{ choice.label }}</twig:Questionnaire:Choice>
+{{ form_start(form) }}
+    <twig:Questionnaire as="div" :interactive="false">
+        <twig:Questionnaire:Progress
+            :current="form_flow_step_index(form) + 1"
+            :total="form_flow_total_steps(form)"
+        />
+
+        <twig:Questionnaire:Item name="{{ field_name(form[step]) }}" required>
+            <twig:Questionnaire:Title>{{ field_label(form[step]) }}</twig:Questionnaire:Title>
+            <twig:Questionnaire:Description>{{ field_help(form[step]) }}</twig:Questionnaire:Description>
+            <twig:Questionnaire:Choices>
+                {% for choice in field_choices(form[step]) %}
+                    <twig:Questionnaire:Choice value="{{ choice.value }}">{{ choice.label }}</twig:Questionnaire:Choice>
+                {% endfor %}
+            </twig:Questionnaire:Choices>
+            {% for error in field_errors(form[step]) %}
+                <twig:Questionnaire:Error>{{ error }}</twig:Questionnaire:Error>
             {% endfor %}
-        </twig:Questionnaire:Choices>
-        {% for error in field_errors(form.verification) %}
-            <twig:Questionnaire:Error>{{ error }}</twig:Questionnaire:Error>
-        {% endfor %}
-    </twig:Questionnaire:Item>
+        </twig:Questionnaire:Item>
 
-    <twig:Questionnaire:Actions>
-        {% if form_flow_can_move_back(form) %}
-            <twig:Questionnaire:Previous name="{{ field_name(form.back) }}">{{ field_label(form.back) }}</twig:Questionnaire:Previous>
-        {% endif %}
+        <twig:Questionnaire:Actions>
+            {% if form_flow_can_move_back(form) %}
+                <twig:Questionnaire:Previous name="{{ field_name(form.navigator.back) }}" formnovalidate>
+                    {{ field_label(form.navigator.back) }}
+                </twig:Questionnaire:Previous>
+            {% endif %}
 
-        {% if form_flow_is_last_step(form) %}
-            <twig:Questionnaire:Submit name="{{ field_name(form.finish) }}">{{ field_label(form.finish) }}</twig:Questionnaire:Submit>
-        {% else %}
-            <twig:Questionnaire:Next name="{{ field_name(form.continue) }}">{{ field_label(form.continue) }}</twig:Questionnaire:Next>
-        {% endif %}
-    </twig:Questionnaire:Actions>
+            {% if form_flow_can_move_next(form) %}
+                <twig:Questionnaire:Next name="{{ field_name(form.navigator.next) }}">
+                    {{ field_label(form.navigator.next) }}
+                </twig:Questionnaire:Next>
+            {% endif %}
 
-    {{ form_rest(form) }}
-</twig:Questionnaire>
+            {% if form_flow_is_last_step(form) %}
+                <twig:Questionnaire:Submit name="{{ field_name(form.navigator.finish) }}">
+                    {{ field_label(form.navigator.finish) }}
+                </twig:Questionnaire:Submit>
+            {% endif %}
+        </twig:Questionnaire:Actions>
+    </twig:Questionnaire>
+{{ form_end(form) }}
 ```
 
-`form_flow_step_index()` is zero-based, hence the `+ 1` for the 1-based `current` prop. The other cursor helpers are `form_flow_current_step()`, `form_flow_steps()`, `form_flow_next_step()`, `form_flow_previous_step()`, `form_flow_first_step()`, `form_flow_last_step()`, `form_flow_is_first_step()` and `form_flow_can_move_next()`.
+The navigator only exposes the buttons that apply to the current step, so each one is guarded rather than rendered unconditionally: `form_flow_can_move_back()` for back, `form_flow_can_move_next()` for next, and `form_flow_is_last_step()` for finish. `formnovalidate` on the back button lets the user return to the previous step without tripping HTML validation on the step they are leaving.
+
+`form_flow_step_index()` is zero-based, hence the `+ 1` for the 1-based `current` prop. The other cursor helpers are `form_flow_steps()`, `form_flow_next_step()`, `form_flow_previous_step()`, `form_flow_first_step()`, `form_flow_last_step()`, `form_flow_is_first_step()` and `form_flow_is_last_step()`.
 
 Two things to watch:
 
-- `field_name()` returns the field's full name, which for a `multiple` choice field already ends in `[]` — and `Questionnaire:Item` appends `[]` of its own when you set `multiple`. Strip one of them: `name="{{ field_name(form.x)|replace({'[]': ''}) }}" multiple`.
-- A `Questionnaire:Input` shares the name of its item so the controller can treat it as an alternative answer. Without the controller that empty input is still submitted and shadows the selected choice, so give it its own name here: `<twig:Questionnaire:Input name="{{ field_name(form.verification_other) }}" />`.
+- `field_name()` returns the field's full name, which for a `multiple` choice field already ends in `[]` — and `Questionnaire:Item` appends `[]` of its own when you set `multiple`. Strip one of them: `name="{{ field_name(form[step])|replace({'[]': ''}) }}" multiple`.
+- A `Questionnaire:Input` shares the name of its item so the controller can treat it as an alternative answer. Without the controller that empty input is still submitted and shadows the selected choice, so give it its own name here: `<twig:Questionnaire:Input name="{{ field_name(form[step].other) }}" />`.
 
 ### RTL
 

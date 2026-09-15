@@ -1,13 +1,18 @@
 {# @prop id string Unique identifier used to generate internal Questionnaire IDs. #}
+{# @prop as 'form'|'div' The HTML tag to render, `div` to nest the questionnaire inside an existing form. #}
 {# @prop defaultItem string Name of the `Questionnaire:Item` shown on initial render. #}
 {# @prop shortcuts 'letters'|'numbers'|null Keyboard shortcut style assigned to each answer. #}
 {# @prop interactive boolean Whether the Stimulus controller drives navigation, validation and shortcuts. #}
 {# @block content The questionnaire structure, typically includes `Questionnaire:Progress`, `Questionnaire:Item` and `Questionnaire:Actions`. #}
-{%- props id = 'questionnaire', defaultItem = '', shortcuts = null, interactive = true -%}
+{%- props id = 'questionnaire', as = 'form', defaultItem = '', shortcuts = null, interactive = true -%}
 {%- do provide('questionnaire.id', id) -%}
 {%- do provide('questionnaire.defaultItem', defaultItem) -%}
 {%- do provide('questionnaire.interactive', interactive) -%}
-<form
+{# A `div` never receives the `submit` event of the form it is nested in, so that action is dropped. #}
+{%- set _questionnaire_actions = as == 'form'
+    ? 'keydown->questionnaire#onKeyDown submit->questionnaire#onSubmit change->questionnaire#onAnswerChange input->questionnaire#onAnswerInput'
+    : 'keydown->questionnaire#onKeyDown change->questionnaire#onAnswerChange input->questionnaire#onAnswerInput' -%}
+<{{ as }}
     id="{{ id }}"
     data-slot="questionnaire"
     {% if interactive %}
@@ -17,8 +22,8 @@
     {{ attributes.defaults({
         class: 'flex w-full min-w-0 flex-col gap-4'|tailwind_classes,
         'data-controller': interactive ? 'questionnaire' : false,
-        'data-action': interactive ? 'keydown->questionnaire#onKeyDown submit->questionnaire#onSubmit change->questionnaire#onAnswerChange input->questionnaire#onAnswerInput' : false,
+        'data-action': interactive ? _questionnaire_actions : false,
     }) }}
 >
     {%- block content %}{% endblock -%}
-</form>
+</{{ as }}>

@@ -122,7 +122,7 @@ export default class extends Controller {
 
             event.preventDefault();
             if (this._isLast(item)) {
-                this.element.requestSubmit();
+                this._form?.requestSubmit();
             } else {
                 this.next();
             }
@@ -143,6 +143,11 @@ export default class extends Controller {
 
     get activeItem() {
         return this._itemByName(this.activeItemValue);
+    }
+
+    // The root is a form on its own, or a div nested in the form that owns submission.
+    get _form() {
+        return this.element.closest('form');
     }
 
     _move(offset) {
