@@ -662,7 +662,7 @@ Compose `Questionnaire` inside a `Dialog` while keeping cancellation and dismiss
 
 ### Server-Driven Flow
 
-Set `:interactive="false"` when the server owns the flow, as with a Symfony Form spread over several steps. The Stimulus controller is not registered at all, so nothing on the client moves the user between questions, validates an answer, or shows and hides the navigation — the server renders the current step, its error, and the buttons it wants.
+Set `:interactive="false"` when the server owns the flow, as with a Symfony [form flow](https://symfony.com/doc/current/form/form_flow.html). The Stimulus controller is not registered at all, so nothing on the client moves the user between questions, validates an answer, or shows and hides the navigation — the server renders the current step, its errors, and the buttons it wants.
 
 In this mode `defaultItem` selects which `Questionnaire:Item` is rendered visible; leave it unset and every item renders, so the usual approach is to output only the current step. `Questionnaire:Progress` takes `current` and `total` to keep the progressbar accurate, `Questionnaire:Error` renders whenever you output it, and `Questionnaire:Previous`, `Questionnaire:Skip` and `Questionnaire:Next` become `type="submit"` so a `name` and `value` tell the server which way to go.
 
@@ -682,38 +682,90 @@ In this mode `defaultItem` selects which `Questionnaire:Item` is rendered visibl
     </twig:Questionnaire:Item>
 
     <twig:Questionnaire:Actions>
-        <twig:Questionnaire:Previous name="flow[back]" value="1" />
-        <twig:Questionnaire:Next name="flow[next]" value="1" />
+        <twig:Questionnaire:Previous name="step" value="back" />
+        <twig:Questionnaire:Next name="step" value="next" />
     </twig:Questionnaire:Actions>
 </twig:Questionnaire>
 ```
 
-Render the item for the step the form flow is on, and read the answer back under the item name:
+#### With a Symfony form flow
+
+A flow type declares its steps and its navigation buttons, and the controller renders the form of the current step:
+
+```php
+use Symfony\Component\Form\Flow\AbstractFlowType;
+use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\Type\{FinishFlowType, NextFlowType, PreviousFlowType};
+
+class MigrationType extends AbstractFlowType
+{
+    public function buildFormFlow(FormFlowBuilderInterface $builder, array $options): void
+    {
+        $builder->addStep('change', ChangeType::class);
+        $builder->addStep('verification', VerificationType::class);
+
+        $builder->add('back', PreviousFlowType::class);
+        $builder->add('continue', NextFlowType::class);
+        $builder->add('finish', FinishFlowType::class);
+    }
+}
+```
+
+```php
+$flow = $this->createForm(MigrationType::class, $migration);
+$flow->handleRequest($request);
+
+if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
+    return $this->redirectToRoute('migration_success');
+}
+
+return $this->render('migration.html.twig', ['form' => $flow->getStepForm()]);
+```
+
+The `form_flow_*()` functions read the flow cursor, and the `field_*()` functions give each field its submitted name, label, choices and errors. `Questionnaire` renders the `form` element itself, so pass `method` and the form's `action` to it rather than wrapping it in `form_start()`, and close with `form_rest()` so the CSRF token and the flow's own hidden fields are still submitted:
 
 ```twig
-<twig:Questionnaire :interactive="false" defaultItem="{{ flow.currentStepName }}">
-    <twig:Questionnaire:Progress :current="flow.currentStepNumber" :total="flow.stepCount" />
+{# `form` is the step form returned by `$flow->getStepForm()` #}
+<twig:Questionnaire :interactive="false" method="post">
+    <twig:Questionnaire:Progress
+        :current="form_flow_step_index(form) + 1"
+        :total="form_flow_total_steps(form)"
+    />
 
-    <twig:Questionnaire:Item name="{{ flow.currentStepName }}" required>
-        <twig:Questionnaire:Title>{{ form.vars.label }}</twig:Questionnaire:Title>
+    <twig:Questionnaire:Item name="{{ field_name(form.verification) }}" required>
+        <twig:Questionnaire:Title>{{ field_label(form.verification) }}</twig:Questionnaire:Title>
         <twig:Questionnaire:Choices>
-            {% for choice in form.vars.choices %}
+            {% for choice in field_choices(form.verification) %}
                 <twig:Questionnaire:Choice value="{{ choice.value }}">{{ choice.label }}</twig:Questionnaire:Choice>
             {% endfor %}
         </twig:Questionnaire:Choices>
-        {% for error in form.vars.errors %}
-            <twig:Questionnaire:Error>{{ error.message }}</twig:Questionnaire:Error>
+        {% for error in field_errors(form.verification) %}
+            <twig:Questionnaire:Error>{{ error }}</twig:Questionnaire:Error>
         {% endfor %}
     </twig:Questionnaire:Item>
 
     <twig:Questionnaire:Actions>
-        <twig:Questionnaire:Previous name="flow[back]" value="1" />
-        <twig:Questionnaire:Next name="flow[next]" value="1" />
+        {% if form_flow_can_move_back(form) %}
+            <twig:Questionnaire:Previous name="{{ field_name(form.back) }}">{{ field_label(form.back) }}</twig:Questionnaire:Previous>
+        {% endif %}
+
+        {% if form_flow_is_last_step(form) %}
+            <twig:Questionnaire:Submit name="{{ field_name(form.finish) }}">{{ field_label(form.finish) }}</twig:Questionnaire:Submit>
+        {% else %}
+            <twig:Questionnaire:Next name="{{ field_name(form.continue) }}">{{ field_label(form.continue) }}</twig:Questionnaire:Next>
+        {% endif %}
     </twig:Questionnaire:Actions>
+
+    {{ form_rest(form) }}
 </twig:Questionnaire>
 ```
 
-A `Questionnaire:Input` shares the name of its item so the controller can treat it as an alternative answer. Without the controller that empty input is still submitted and shadows the selected choice, so give it its own `name` here: `<twig:Questionnaire:Input name="verification_other" />`.
+`form_flow_step_index()` is zero-based, hence the `+ 1` for the 1-based `current` prop. The other cursor helpers are `form_flow_current_step()`, `form_flow_steps()`, `form_flow_next_step()`, `form_flow_previous_step()`, `form_flow_first_step()`, `form_flow_last_step()`, `form_flow_is_first_step()` and `form_flow_can_move_next()`.
+
+Two things to watch:
+
+- `field_name()` returns the field's full name, which for a `multiple` choice field already ends in `[]` — and `Questionnaire:Item` appends `[]` of its own when you set `multiple`. Strip one of them: `name="{{ field_name(form.x)|replace({'[]': ''}) }}" multiple`.
+- A `Questionnaire:Input` shares the name of its item so the controller can treat it as an alternative answer. Without the controller that empty input is still submitted and shadows the selected choice, so give it its own name here: `<twig:Questionnaire:Input name="{{ field_name(form.verification_other) }}" />`.
 
 ### RTL
 
