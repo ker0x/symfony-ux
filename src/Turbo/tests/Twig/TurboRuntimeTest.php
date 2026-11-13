@@ -11,11 +11,21 @@
 
 namespace Symfony\UX\Turbo\Tests\Twig;
 
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\UX\Turbo\Broadcaster\IdAccessor;
 use Symfony\UX\Turbo\StreamSourceRendererInterface;
+use Symfony\UX\Turbo\Tests\Fixtures\Entity\Invoice;
+use Symfony\UX\Turbo\Tests\Fixtures\Entity\Membership;
+use Symfony\UX\Turbo\Tests\Fixtures\Entity\Player;
+use Symfony\UX\Turbo\Tests\Fixtures\Entity\Team;
+use Symfony\UX\Turbo\Tests\Fixtures\Entity\Ticket;
+use Symfony\UX\Turbo\Tests\Fixtures\EntityManagerFactory;
 use Symfony\UX\Turbo\TurboFrame;
 use Symfony\UX\Turbo\Twig\TurboRuntime;
 use Symfony\UX\Turbo\Twig\TurboStreamListenRendererInterface;
@@ -39,7 +49,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $html = $runtime->renderTurboStreamFrom($twig, 'a_topic');
 
         $this->assertSame(
@@ -64,7 +74,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $html = $runtime->renderTurboStreamFrom($twig, 'a_topic', true);
 
         $this->assertSame(
@@ -89,7 +99,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $html = $runtime->renderTurboStreamFrom($twig, 'a_topic', false, null, ['id' => 'a_topic_stream']);
 
         $this->assertSame(
@@ -114,7 +124,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $html = $runtime->renderTurboStreamFrom($twig, 'chat', true, null, [], ['chat', 'news']);
 
         $this->assertSame(
@@ -135,7 +145,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "subscribe" option of turbo_stream_from() needs the "private" option.');
@@ -155,7 +165,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $html = $runtime->renderTurboStreamFrom($twig, 'chat');
 
         $this->assertSame(
@@ -176,7 +186,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($renderers, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $runtime->renderTurboStreamFrom($twig, 'a_topic');
     }
 
@@ -195,7 +205,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($container, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($container, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $runtime->renderTurboStreamListen($twig, 'a_topic');
     }
 
@@ -216,7 +226,7 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($container, 'hub1', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($container, 'hub1', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $runtime->renderTurboStreamListen($twig, 'a_topic', 'hub2');
     }
 
@@ -233,7 +243,61 @@ final class TurboRuntimeTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $runtime = new TurboRuntime($container, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers);
+        $runtime = new TurboRuntime($container, 'default', new TurboFrame(new RequestStack()), $streamSourceRenderers, new IdAccessor());
         $runtime->renderTurboStreamListen($twig, 'a_topic', 'default', ['hub' => 'hub3']);
+    }
+
+    public function testDomIdOfAnEntity(): void
+    {
+        $this->assertSame('player_42', $this->createRuntime($this->createDoctrineIdAccessor())->domId(new Player(42)));
+    }
+
+    public function testDomIdOfAnEntityWithACompositeIdentifier(): void
+    {
+        $membership = new Membership(new Player(1), new Team(2));
+
+        $this->assertSame('membership_1-2', $this->createRuntime($this->createDoctrineIdAccessor())->domId($membership));
+    }
+
+    public function testDomIdOfAnEntityWithAUuidIdentifier(): void
+    {
+        $ticket = new Ticket(Uuid::fromString('3f0c252d-88d4-449e-b5a9-dd793e393354'));
+
+        $this->assertSame('ticket_3f0c252d-88d4-449e-b5a9-dd793e393354', $this->createRuntime($this->createDoctrineIdAccessor())->domId($ticket));
+    }
+
+    public function testDomIdOfAnEntityWithAUlidIdentifier(): void
+    {
+        $invoice = new Invoice(Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV'));
+
+        $this->assertSame('invoice_01ARZ3NDEKTSV4RRFFQ69G5FAV', $this->createRuntime($this->createDoctrineIdAccessor())->domId($invoice));
+    }
+
+    public function testDomIdOfAnEntityWithACompositeIdentifierNotSavedYet(): void
+    {
+        $idAccessor = $this->createStub(IdAccessor::class);
+        // IdAccessor joins the identifier of an association not saved yet into an empty string
+        $idAccessor->method('getEntityId')->willReturn(['player' => '', 'team' => '2']);
+
+        $membership = new Membership(new Player(1), new Team(2));
+
+        $this->assertSame('new_membership', $this->createRuntime($idAccessor)->domId($membership));
+    }
+
+    private function createRuntime(IdAccessor $idAccessor): TurboRuntime
+    {
+        $locator = new class([]) implements ServiceProviderInterface {
+            use ServiceLocatorTrait;
+        };
+
+        return new TurboRuntime($locator, 'default', new TurboFrame(new RequestStack()), $locator, $idAccessor);
+    }
+
+    private function createDoctrineIdAccessor(): IdAccessor
+    {
+        $doctrine = $this->createStub(ManagerRegistry::class);
+        $doctrine->method('getManagerForClass')->willReturn(EntityManagerFactory::create());
+
+        return new IdAccessor(null, $doctrine);
     }
 }

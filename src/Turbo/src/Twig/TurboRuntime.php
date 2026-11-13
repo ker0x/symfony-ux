@@ -13,6 +13,8 @@ namespace Symfony\UX\Turbo\Twig;
 
 use Psr\Container\ContainerInterface;
 use Symfony\UX\Turbo\Bridge\Mercure\TopicSet;
+use Symfony\UX\Turbo\Broadcaster\IdAccessor;
+use Symfony\UX\Turbo\Doctrine\ClassUtil;
 use Symfony\UX\Turbo\TurboFrame;
 use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
@@ -30,6 +32,7 @@ final class TurboRuntime implements RuntimeExtensionInterface
         private readonly string $defaultTransport,
         private readonly TurboFrame $turboFrame,
         private ContainerInterface $streamSourceRenderers,
+        private readonly IdAccessor $idAccessor,
     ) {
     }
 
@@ -97,5 +100,29 @@ final class TurboRuntime implements RuntimeExtensionInterface
     public function getTurboFrameRequestId(): ?string
     {
         return $this->turboFrame->getRequestId();
+    }
+
+    public function domId(object $object, ?string $prefix = null): string
+    {
+        $id = $this->idAccessor->getEntityId($object);
+
+        if (null === $id) {
+            throw new \LogicException(\sprintf('Cannot read the identifier of "%s". Install the PropertyAccess component with "composer require symfony/property-access", or map the class with Doctrine.', $object::class));
+        }
+
+        // Adapted from ByteString::snake()
+        $name = preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', new \ReflectionClass(ClassUtil::getEntityClass($object))->getShortName())
+            ?? throw new \RuntimeException(preg_last_error_msg());
+        $name = strtolower($name);
+
+        if ('' === $prefix) {
+            $prefix = null;
+        }
+
+        if ([] === $id || \in_array(null, $id, true) || \in_array('', $id, true)) {
+            return ($prefix ?? 'new').'_'.$name;
+        }
+
+        return (null !== $prefix ? $prefix.'_' : '').$name.'_'.implode('-', $id);
     }
 }

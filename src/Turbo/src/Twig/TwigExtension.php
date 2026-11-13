@@ -45,6 +45,7 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction('turbo_refreshes_with', $this->turboRefreshesWith(...), ['is_safe' => ['html']]),
             new TwigFunction('turbo_refresh_method', $this->turboRefreshMethod(...), ['is_safe' => ['html']]),
             new TwigFunction('turbo_refresh_scroll', $this->turboRefreshScroll(...), ['is_safe' => ['html']]),
+            new TwigFunction('turbo_dom_id', [TurboRuntime::class, 'domId']),
         ];
     }
 

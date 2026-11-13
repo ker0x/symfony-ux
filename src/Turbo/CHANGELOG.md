@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.8
+
+- Add the `turbo_dom_id()` Twig function, to build the HTML id of an object from its class and its identifier
+
 ## 3.7.0
 
 - Render the HTML attributes of `<twig:Turbo:Stream:From>` on the `<turbo-mercure-stream-source>` element, and add an `attributes` argument to `turbo_stream_from()`

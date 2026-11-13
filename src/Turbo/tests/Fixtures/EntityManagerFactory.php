@@ -12,9 +12,12 @@
 namespace Symfony\UX\Turbo\Tests\Fixtures;
 
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * Creates an in-memory sqlite EntityManager holding every entity under Fixtures/Entity.
@@ -25,6 +28,12 @@ final class EntityManagerFactory
 {
     public static function create(): EntityManager
     {
+        foreach ([UuidType::NAME => UuidType::class, UlidType::NAME => UlidType::class] as $name => $class) {
+            if (!Type::hasType($name)) {
+                Type::addType($name, $class);
+            }
+        }
+
         $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: [__DIR__.'/Entity'],
             isDevMode: true,

@@ -548,6 +548,53 @@ Turbo also provides the ``before``, ``after`` and ``refresh`` actions and a
 *morphing* mode for ``replace`` and ``update``. They are all explained in the
 :ref:`list of stream actions <turbo-stream-actions>`.
 
+Element Ids
+^^^^^^^^^^^
+
+Stream messages and frames find their elements by ``id``, so the page and the response must build the same ``id`` for the same object.
+The ``turbo_dom_id()`` Twig function builds it from the class and the identifier of an object:
+
+.. code-block:: html+twig
+
+    <li id="{{ turbo_dom_id(task) }}">{{ task.title }}</li>
+
+    <twig:Turbo:Stream:Replace target="#{{ turbo_dom_id(task) }}">
+        <li id="{{ turbo_dom_id(task) }}">{{ task.title }}</li>
+    </twig:Turbo:Stream:Replace>
+
+    {# output: #}
+    <li id="task_42">My task</li>
+
+    <turbo-stream action="replace" targets="#task_42">
+        <template>
+            <li id="task_42">My task</li>
+        </template>
+    </turbo-stream>
+
+The ``id`` starts with the class name in snake case (``task``, or ``blog_post`` for a ``BlogPost`` class).
+A CSS selector cannot start with a digit, so this also makes ``#{{ turbo_dom_id(task) }}`` a valid selector when the identifier is a number, a UUID or a ULID (e.g. ``#task_3f0c252d-88d4-449e-b5a9-dd793e393354``).
+
+The identifier is used as is. When it contains characters that a CSS selector does not accept after ``#``, such as the ``.`` of ``release_v1.2``, use an attribute selector instead:
+
+.. code-block:: html+twig
+
+    <twig:Turbo:Stream:Remove target="[id='{{ turbo_dom_id(release) }}']" />
+
+The second argument adds a prefix, to give different elements of the same object their own ``id``:
+
+.. code-block:: twig
+
+    {{ turbo_dom_id(task, 'edit') }}   {# edit_task_42 #}
+
+An object that has no identifier yet, such as a task that is not saved, gets ``new`` as prefix (``new_task``), or the given prefix (``edit_task``).
+
+The identifier is read from the Doctrine mapping of the class, or else from its ``id`` property.
+A composite identifier is joined with ``-`` (e.g. ``membership_1-2``).
+
+.. versionadded:: 3.8
+
+    The ``turbo_dom_id()`` Twig function was introduced in Symfony UX 3.8.
+
 How Stream Messages Reach the Page
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
